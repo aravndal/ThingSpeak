@@ -4,9 +4,10 @@
 The ThingSpeak Plugin allows CraftBeerPi 3.0 to send sensor data to ThingSpeak.com
 
 ## Add a Channel on ThingSpeak.com
-1. Login into you ThingSpeak.com account and add a New Channel
-2. Write down your "Channel ID"
-3. Write down you "User API Key", found under Account - MyProfile
+1. Login to your ThingSpeak.com account
+2. Write down you "User API Key", found under Account - MyProfile
+3. Add a New Channel
+4. Write down your "Channel ID"
 
 ## Use
 1. Download this Plugin from CraftBeerPi 3 Add-On page
