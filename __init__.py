@@ -96,7 +96,6 @@ def thingspeak_background_task(api):
     log("ThingSpeak background task")
     if thingspeak_ok is None:
         thingspeakFields()
-    # YOUR CODE GOES HERE
     if drop_first is None:
         drop_first = False
         return False
