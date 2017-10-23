@@ -64,6 +64,7 @@ def thingspeakFields():
     path = "/channels/%s.json" % thingspeak_chnid
     data_api = "{'api_key':'%s'" % thingspeak_api
     data = ", 'name':'%s'" % brewery_name
+    data += ", 'tags':'Brew, CraftBeerPi, Beer, RaspBerryPi'"
     for key, value in cbpi.cache.get("sensors").iteritems():
         data += ", 'field%s':'%s'" % (cnt, value.name)
         cnt += 1
