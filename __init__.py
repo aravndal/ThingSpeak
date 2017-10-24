@@ -3,7 +3,7 @@ from thread import start_new_thread
 import logging
 import urllib, json, httplib
 
-DEBUG = False
+DEBUG = True
 thingspeak_api = None
 thingspeak_chnid = None
 thingspeak_ok = None
@@ -20,9 +20,11 @@ def httpCon(path='', data_load='', meth='GET'):
     global url
     log("%s to URL %s - %s - %s" % (meth, url, path, data_load))
     try:
+        data_load = eval(data_load)
         params = urllib.urlencode(data_load)
         conn = httplib.HTTPSConnection(url)
         path += "?" + params if params != "" else ""
+        log("Path: %s" % path)
         conn.request(meth, path)
         response = conn.getresponse()
         try:
@@ -60,6 +62,8 @@ def Fillfield(jsonstr, key, value):
     data = ""
     if key in jsonstr:
         data = ", '%s':'%s'" % (key, value) if jsonstr[key] == "" else ""
+    else:
+        data = ", '%s':'%s'" % (key, value)
     return data
 
 def thingspeakFields():
@@ -72,26 +76,26 @@ def thingspeakFields():
         cbpi.notify("ThingSpeak Error", "Please update config parameter", type="danger")
         return False
     brewery_name = cbpi.get_config_parameter("brewery_name", "CraftBeerPi")
-    path = "/channels/%s.json" % thingspeak_chnid
-    result = httpCon(path)
-    log("JSON: %s" % result)
     data_api = "{'api_key':'%s'" % thingspeak_api
+    path = "/channels/%s.json" % thingspeak_chnid
+    result = httpCon(path, data_api+"}")
+    log("JSON: %s" % result)
     data = ""
-    data += Fillfield(result, "name", brewery_name)
     data += Fillfield(result, "tags", "Brew, CraftBeerPi, Beer, RaspBerryPi")
     data += Fillfield(result, "description", "The CraftBeerPi temperature sensor logging for the brewery %s." % brewery_name)
-    path = "/channels/%s/feeds.json?results=0" % thingspeak_chnid
-    result = httpCon(path)
+    path = "/channels/%s/feeds.json" % thingspeak_chnid
+    result = httpCon(path, data_api+", 'results':'0'}")
     log("JSON: %s" % result)
     path = "/channels/%s.json" % thingspeak_chnid
-    tst = ""
     for key, value in cbpi.cache.get("sensors").iteritems():
         field = 'field%s' % cnt
-        data += Fillfield(result["channel"], field, value.name)
+        try:
+            data += Fillfield(result["channel"], field, value.name)
+        except:
+            data += Fillfield({}, field, value.name)
         cnt += 1
     data += "}"
     data = data_api + data
-    data = eval(data)
     result = httpCon(path, data, 'PUT')
     thingspeak_api_write = result["api_keys"][0]["api_key"]
     log("API Write: %s" % thingspeak_api_write)
@@ -130,7 +134,6 @@ def thingspeak_background_task(api):
         cnt += 1
     data += "}"
     data = data_api + data
-    data = eval(data)
     result = httpCon(path, data)
     log("URL Result: %s" % result.read())
 
