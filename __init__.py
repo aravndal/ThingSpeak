@@ -70,7 +70,6 @@ def thingspeakFields():
     global thingspeak_ok
     global thingspeak_api
     global thingspeak_api_write
-    cnt = 1
     if (thingspeak_api == "" or thingspeak_chnid == ""):
         log("ThingSpeak Config error")
         cbpi.notify("ThingSpeak Error", "Please update config parameter", type="danger")
@@ -87,6 +86,7 @@ def thingspeakFields():
     result = httpCon(path, data_api+", 'results':'0'}")
     log("JSON: %s" % result)
     path = "/channels/%s.json" % thingspeak_chnid
+    cnt = 1
     for key, value in cbpi.cache.get("sensors").iteritems():
         field = 'field%s' % cnt
         try:
@@ -125,10 +125,10 @@ def thingspeak_background_task(api):
         log("ThingSpeak Write API not got from site")
         cbpi.notify("ThingSpeak Error", "Please try to update config parameter and reboot.", type="danger")
         return False
-    cnt = 1
     path = "/update.json"
     data_api = "{'api_key':'%s'" % thingspeak_api_write
     data = ""
+    cnt = 1
     for key, value in cbpi.cache.get("sensors").iteritems():
         data += ", 'field%s':'%s'" % (cnt, value.instance.last_value)
         cnt += 1
