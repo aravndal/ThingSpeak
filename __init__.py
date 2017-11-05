@@ -3,7 +3,7 @@ from thread import start_new_thread
 import logging
 import urllib, json, httplib
 
-DEBUG = True
+DEBUG = False
 thingspeak_api = None
 thingspeak_chnid = None
 thingspeak_ok = None
