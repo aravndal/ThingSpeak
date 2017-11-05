@@ -46,9 +46,12 @@ def httpJSON(url, path='', param='', data=''):
     url += "?" + params if params != "" else ""
     headers = {'content-type': 'application/json'}
     log("URL: %s, JSON: %s" % (url, data))
-    response = requests.post(url, data=data, headers=headers)
-    log("response %s" % response)
-    return response
+    try:
+        response = requests.post(url, data=data, headers=headers)
+        log("response %s" % response)
+        return response
+    except:
+        return False
 
 def thingspeakAPI():
     global thingspeak_api
