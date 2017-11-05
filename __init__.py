@@ -3,7 +3,7 @@ from thread import start_new_thread
 import logging
 import urllib, json, httplib, requests
 
-DEBUG = True
+DEBUG = False
 thingspeak_api = None
 thingspeak_chnid = None
 ubidots_token = None
@@ -181,7 +181,7 @@ def UbidotsUpdate(data):
     param = "{'token':'%s'}" % ubidots_token
     result = httpJSON(url, path, param, data)
 
-@cbpi.backgroundtask(key="thingspeak_task", interval=20)
+@cbpi.backgroundtask(key="thingspeak_task", interval=60)
 def thingspeak_background_task(api):
     log("IOT background task")
     global drop_first
