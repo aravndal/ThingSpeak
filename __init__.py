@@ -1,7 +1,7 @@
 from modules import cbpi
-from thread import start_new_thread
+from _thread import start_new_thread
 import logging
-import urllib, json, httplib, requests
+import urllib.request, urllib.parse, urllib.error, json, http.client, requests
 
 DEBUG = False
 thingspeak_api = None
@@ -21,8 +21,8 @@ def httpCon(url, path='', data_load='', meth='GET'):
     log("%s to URL %s - %s - %s" % (meth, url, path, data_load))
     try:
         data_load = eval(data_load)
-        params = urllib.urlencode(data_load)
-        conn = httplib.HTTPSConnection(url)
+        params = urllib.parse.urlencode(data_load)
+        conn = http.client.HTTPSConnection(url)
         path += "?" + params if params != "" else ""
         log("Path: %s" % path)
         conn.request(meth, path)
@@ -41,7 +41,7 @@ def httpCon(url, path='', data_load='', meth='GET'):
 def httpJSON(url, path='', param='', data=''):
     log("URL %s - %s - %s, json %s" % (url, path, param, data))
     param = eval(param)
-    params = urllib.urlencode(param)
+    params = urllib.parse.urlencode(param)
     url += path
     url += "?" + params if params != "" else ""
     headers = {'content-type': 'application/json'}
@@ -123,7 +123,7 @@ def thingspeakFields():
     log("JSON: %s" % result)
     path = "/channels/%s.json" % thingspeak_chnid
     cnt = 1
-    for key, value in cbpi.cache.get("sensors").iteritems():
+    for key, value in list(cbpi.cache.get("sensors").items()):
         field = 'field%s' % cnt
         try:
             data += Fillfield(result["channel"], field, value.name)
@@ -173,10 +173,10 @@ def UbidotsUpdate(data):
         log("Ubidots Token or label incorrect")
         cbpi.notify("Ubidots Error", "Please try to update config parameter and reboot.", type="danger")
         return False
-    for count, (key, value) in enumerate(cbpi.cache["kettle"].iteritems(), 1):
+    for count, (key, value) in enumerate(iter(list(cbpi.cache["kettle"].items())), 1):
         if value.target_temp is not None:
             data += ", \"target_temp_%s\":%s" % (count,value.target_temp)
-    for count, (key, value) in enumerate(cbpi.cache["actors"].iteritems(), 1):
+    for count, (key, value) in enumerate(iter(list(cbpi.cache["actors"].items())), 1):
         if value.state is not None:
             data += ", \"actor_%s\":%s" % (value.name,value.state)
     data += "}"
@@ -194,7 +194,7 @@ def thingspeak_background_task(api):
     cnt = 1
     dataT= ""
     dataU= "{"
-    for key, value in cbpi.cache.get("sensors").iteritems():
+    for key, value in list(cbpi.cache.get("sensors").items()):
         dataT += ", 'field%s':'%s'" % (cnt, value.instance.last_value)
         dataU += ", " if key >1 else ""
         dataU += "\"%s\":%s" % (value.name, value.instance.last_value)
